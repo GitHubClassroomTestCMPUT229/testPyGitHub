@@ -114,10 +114,11 @@ def clone(lab, team):
     token = get_token()
     g = Github(token)
     org = g.get_organization("GitHubClassroomTestCMPUT229")
-    url = "https://"+token+":x-oauth-basic@github.com/GitHubClassroomTestCMPUT229/"
-    base_code = "testlab1"
+    bare_url = "github.com/GitHubClassroomTestCMPUT229/"
+    auth_url = "https://"+token+":x-oauth-basic@"
+    url = auth_url + bare_url
     team_name = lab+"_"+team
-    base_repo = Repo.clone_from(url+base_code, "./base/")
+    base_repo = Repo.clone_from(url+lab, "./base/")
     team_repo = org.create_repo(team_name)
     remote = base_repo.create_remote(team_repo.name, url+team_name)
     remote.push()

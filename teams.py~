@@ -109,13 +109,14 @@ def set_repos(lab="testlab1"):
     f = open("teams.json", "w")
     json.dump(data, f)
     f.close()
-    print data
 
 def clone(lab, team):
     token = get_token()
     g = Github(token)
     org = g.get_organization("GitHubClassroomTestCMPUT229")
-    url = "https://"+token+":x-oauth-basic@github.com/GitHubClassroomTestCMPUT229/"
+    bare_url = "github.com/GitHubClassroomTestCMPUT229/"
+    auth_url = "https://"+token+":x-oauth-basic@"
+    url = auth_url + bare_url
     base_code = "testlab1"
     team_name = lab+"_"+team
     base_repo = Repo.clone_from(url+base_code, "./base/")
