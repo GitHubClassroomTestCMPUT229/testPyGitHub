@@ -2,16 +2,12 @@ from github import Github
 
 # Generate token for github:
 #   https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/
-#   Access token:   f91c7b257571da2dba998379826e94d72b16fada
-#                   18813125cc1330970de92d2c70332806ed35284a (All permissions)
-#                   a889a5ec4ac33257aee6d29fb1da2c361d9f37d9
 # PyGithub users & organizations:
 #   https://github.com/PyGithub/PyGithub/issues/507
 # create_team in: 
 #   https://github.com/PyGithub/PyGithub/blob/master/github/Organization.py
 
 def main():
-    token = "a889a5ec4ac33257aee6d29fb1da2c361d9f37d9"
     g = Github(token)   # Ref to github.com using permissions granted by token
     org = g.get_organization("GitHubClassroomTestCMPUT229")
 
