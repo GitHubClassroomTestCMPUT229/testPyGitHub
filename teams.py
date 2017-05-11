@@ -114,6 +114,28 @@ def set_repos(lab="testlab1"):
     json.dump(repos, f)
     f.close()
 
+def del_repos(lab="testlab1"):
+    token = get_token()
+    g = Github(token)
+    org = g.get_organization("GitHubClassroomTestCMPUT229")
+    teams = org.get_teams()
+    for team in teams:
+        repos = team.get_repos()
+        for repo in repos:
+            if lab in repo.name:
+                print "deleting " + repo.name
+                repo.delete()
+
+def del_teams():
+    token = get_token()
+    g = Github(token)
+    org = g.get_organization("GitHubClassroomTestCMPUT229")
+    teams = org.get_teams()
+    for team in teams:
+        if team.name != "Students":
+            print "deleting " + team.name
+            team.delete()
+
 def clone(lab, team, base_repo):
     token = get_token()
     g = Github(token)
@@ -165,7 +187,9 @@ def test_get_repo():
 def main():
     # set_teams()
     # set_git_teams()
-    set_repos()
+    # set_repos()
+    del_repos()
+    del_teams()
     # test_get_repo()
     # insert_auth("https://github.com/GitHubClassroomTestCMPUT229/")
     # local_clone("testlab1")
