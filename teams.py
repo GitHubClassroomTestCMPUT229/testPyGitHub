@@ -94,41 +94,54 @@ def set_git_teams():
     
 
 def set_repos(lab="testlab1"):
-    f = open("team_defs.json", "r")
-    teams = json.load(f)
-    f.close()
-
     token = get_token()
     g = Github(token)
     org = g.get_organization("GitHubClassroomTestCMPUT229")
-    
-    data = {}
+    teams = org.get_teams()
+
+    repos = {}
+    base = local_clone(lab)
     for team in teams:
-        info = clone(lab, team) 
-        data[team] = info
+        if team.name != "Students":
+            try:
+                team_repo = clone(lab, team, base) 
+                repos[team.name] = team_repo
+            except Exception as e:
+                print "Error cloning lab for " + team.name
+                print e
+    remove_local()
     f = open("teams.json", "w")
-    json.dump(data, f)
+    json.dump(repos, f)
     f.close()
 
-def clone(lab, team):
+def clone(lab, team, base_repo):
     token = get_token()
     g = Github(token)
     org = g.get_organization("GitHubClassroomTestCMPUT229")
-    bare_url = "github.com/GitHubClassroomTestCMPUT229/"
-    auth_url = "https://"+token+":x-oauth-basic@"
-    url = auth_url + bare_url
-    team_name = lab+"_"+team
-    base_repo = Repo.clone_from(url+lab, "./base/")
-    team_repo = org.create_repo(team_name)
-    remote = base_repo.create_remote(team_repo.name, url+team_name)
-    remote.push()
+    url = "https://github.com/GitHubClassroomTestCMPUT229/"
+    base_url = url+lab
+    repo_name = lab + "_" + team.name
+    repo_url = url + repo_name
+    team_repo = org.create_repo(repo_name, team_id=team)
+    remote = base_repo.create_remote(team_repo.name, insert_auth(repo_url))
+    remote.push()  
+    return {lab: repo_url}
+
+def remove_local():
     shutil.rmtree("./base/")
-    return {lab: url+team_name}
+
+# Takes in a url to a github resource, and inserts an oauth token in the url
+# This function is used to make access easier, and to keep from committing 
+# oauth tokens to git repos.  It lets the url remain unaltered at the higher scope.
+def insert_auth(url):
+    token = get_token()
+    url = url[:url.find("://")+3] + token + ":x-oauth-basic@" + url[url.find("github"):]
+    return url
 
 def local_clone(lab):
     token = get_token()
-    url = "https://"+token+":x-oauth-basic@github.com/GitHubClassroomTestCMPUT229/"+lab
-    base_repo = Repo.clone_from(url, "./base/")
+    url = "https://github.com/GitHubClassroomTestCMPUT229/"+lab
+    base_repo = Repo.clone_from(insert_auth(url), "./base/")
     return base_repo
 
 # Oauth tokens in gitpython    
@@ -148,14 +161,16 @@ def test_get_repo():
     remote = base_repo.create_remote(team_repo.name, url+team_name)
     remote.push()
     shutil.rmtree("./base/")
-    
-    
 
 def main():
-    set_teams()
-    set_git_teams()
+    # set_teams()
+    # set_git_teams()
     set_repos()
-    #test_get_repo()
+    # test_get_repo()
+    # insert_auth("https://github.com/GitHubClassroomTestCMPUT229/")
+    # local_clone("testlab1")
+    
+    return
 
 if __name__ == "__main__":
     main()
